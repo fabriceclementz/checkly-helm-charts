@@ -32,6 +32,9 @@ spec:
         {{- else }}
         query: {{ printf "sum(checkly_private_location_check_runs{state=~\"queued|inflight\", private_location_slug_name=\"%s\"})" (required "autoscaling.privateLocationSlugName is required when autoscaling is enabled" $slug) | quote }}
         {{- end }}
+        {{- range $key, $value := .Values.autoscaling.prometheus.metadata }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
       {{- with .Values.autoscaling.prometheus.authenticationRef }}
       authenticationRef:
         {{- toYaml . | nindent 8 }}

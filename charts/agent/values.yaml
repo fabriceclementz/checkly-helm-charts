@@ -24,10 +24,16 @@ autoscaling:
   query: ""
   prometheus:
     serverAddress: ""
-    # Reference to a KEDA TriggerAuthentication if your Prometheus server requires authentication
+    # Reference to a KEDA TriggerAuthentication if your Prometheus server requires authentication.
+    # Also set metadata.authModes: KEDA 2.17 and older only read it from the trigger metadata.
     # authenticationRef:
     #   name: keda-prometheus-auth
     authenticationRef: {}
+    # Extra metadata for the Prometheus trigger: https://keda.sh/docs/latest/scalers/prometheus/
+    # metadata:
+    #   authModes: basic
+    #   unsafeSsl: "true"
+    metadata: {}
   # HPA scaling behavior
   behavior:
     scaleUp:

@@ -72,7 +72,20 @@ When autoscaling is enabled:
 - The scaling threshold defaults to `env.JOB_CONCURRENCY` (or `1`), as recommended. It can be overridden with `autoscaling.threshold`.
 - `terminationGracePeriodSeconds` defaults to `330` so in-flight checks can complete on scaled-down pods.
 
-Use `autoscaling.query` to override the default query, and `autoscaling.prometheus.authenticationRef` to reference a KEDA `TriggerAuthentication` if your Prometheus server requires authentication. See [values.yaml](values.yaml) for all options.
+Use `autoscaling.query` to override the default query. See [values.yaml](values.yaml) for all options.
+
+If your Prometheus server requires authentication, reference a KEDA `TriggerAuthentication` with `autoscaling.prometheus.authenticationRef` and set the authentication mode with `autoscaling.prometheus.metadata.authModes`:
+
+```
+autoscaling:
+  prometheus:
+    authenticationRef:
+      name: keda-prometheus-auth
+    metadata:
+      authModes: basic
+```
+
+`autoscaling.prometheus.metadata` accepts any other parameter of the [KEDA Prometheus scaler](https://keda.sh/docs/latest/scalers/prometheus/), for instance `unsafeSsl` or `customHeaders`.
 
 ## Alternative ways to set the agent API Key
 
