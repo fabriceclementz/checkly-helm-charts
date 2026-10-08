@@ -87,6 +87,17 @@ autoscaling:
 
 `autoscaling.prometheus.metadata` accepts any other parameter of the [KEDA Prometheus scaler](https://keda.sh/docs/latest/scalers/prometheus/), for instance `unsafeSsl` or `customHeaders`.
 
+### Using your own ScaledObject or HPA
+
+If you already manage a `ScaledObject` or an HPA for the agent Deployment, set `autoscaling.scaledObject.create` to `false`. The chart then leaves `spec.replicas` unset and does not create a `ScaledObject`:
+
+```
+autoscaling:
+  enabled: true
+  scaledObject:
+    create: false
+```
+
 ## Alternative ways to set the agent API Key
 
 Instead of setting `apiKeySecret.apiKey` you can also choose an existing secret with the following options

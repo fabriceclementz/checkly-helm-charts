@@ -1,7 +1,7 @@
 # Default values for agent.
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
-# Ignored when autoscaling.enabled is true: the replica count is then managed by KEDA.
+# Ignored when autoscaling.enabled is true: the replica count is then managed by the autoscaler.
 replicaCount: 1
 
 # Autoscale the agents with KEDA based on the number of queued and in-flight check runs.
@@ -11,6 +11,10 @@ replicaCount: 1
 # (the checkly_private_location_check_runs metric) available in a Prometheus-compatible server.
 autoscaling:
   enabled: false
+  scaledObject:
+    # Set to false if you manage your own ScaledObject or HPA for the agent Deployment.
+    # The chart then only leaves spec.replicas unset, and the other autoscaling values are not used.
+    create: true
   minReplicaCount: 2
   maxReplicaCount: 10
   # How often KEDA checks the trigger (KEDA default: 30). The metric is aggregated over ~1 minute.

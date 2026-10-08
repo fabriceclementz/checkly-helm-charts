@@ -1,4 +1,4 @@
-{{- if .Values.autoscaling.enabled -}}
+{{- if and .Values.autoscaling.enabled .Values.autoscaling.scaledObject.create -}}
 {{- $slug := .Values.autoscaling.privateLocationSlugName -}}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
