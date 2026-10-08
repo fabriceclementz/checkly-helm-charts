@@ -44,6 +44,36 @@ resource "helm_release" "checkly_agent" {
 }
 ```
 
+## Autoscaling with KEDA
+
+The chart can create a [KEDA](https://keda.sh) `ScaledObject` that scales the agents based on the number of queued and in-flight check runs, as described in the [autoscaling documentation](https://www.checklyhq.com/docs/platform/private-locations/autoscaling/).
+
+Prerequisites:
+
+- KEDA installed in the cluster
+- Prometheus V2 metrics ingestion enabled, with the `checkly_private_location_check_runs` metric available in a Prometheus-compatible server
+
+```
+env:
+  JOB_CONCURRENCY: 5
+
+autoscaling:
+  enabled: true
+  minReplicaCount: 2
+  maxReplicaCount: 10
+  privateLocationSlugName: my-private-location
+  prometheus:
+    serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+```
+
+When autoscaling is enabled:
+
+- `spec.replicas` is not set on the Deployment, so the replica count is owned by the HPA managed by KEDA and `replicaCount` is ignored. This avoids conflicts between Helm and the HPA, for instance with server-side apply.
+- The scaling threshold defaults to `env.JOB_CONCURRENCY` (or `1`), as recommended. It can be overridden with `autoscaling.threshold`.
+- `terminationGracePeriodSeconds` defaults to `330` so in-flight checks can complete on scaled-down pods.
+
+Use `autoscaling.query` to override the default query, and `autoscaling.prometheus.authenticationRef` to reference a KEDA `TriggerAuthentication` if your Prometheus server requires authentication. See [values.yaml](values.yaml) for all options.
+
 ## Alternative ways to set the agent API Key
 
 Instead of setting `apiKeySecret.apiKey` you can also choose an existing secret with the following options

@@ -1,7 +1,46 @@
 # Default values for agent.
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+# Ignored when autoscaling.enabled is true: the replica count is then managed by KEDA.
 replicaCount: 1
+
+# Autoscale the agents with KEDA based on the number of queued and in-flight check runs.
+# More information can be found here: https://www.checklyhq.com/docs/platform/private-locations/autoscaling/
+#
+# Requires KEDA installed in the cluster and Prometheus V2 metrics ingestion
+# (the checkly_private_location_check_runs metric) available in a Prometheus-compatible server.
+autoscaling:
+  enabled: false
+  minReplicaCount: 2
+  maxReplicaCount: 10
+  # How often KEDA checks the trigger (KEDA default: 30). The metric is aggregated over ~1 minute.
+  pollingInterval:
+  # Slug of the private location, used to build the default query
+  privateLocationSlugName: ""
+  # Check runs per pod before scaling up. Defaults to env.JOB_CONCURRENCY, or 1.
+  threshold: ""
+  # Override the default query. Supports templating.
+  # default: sum(checkly_private_location_check_runs{state=~"queued|inflight", private_location_slug_name="<privateLocationSlugName>"})
+  query: ""
+  prometheus:
+    serverAddress: ""
+    # Reference to a KEDA TriggerAuthentication if your Prometheus server requires authentication
+    # authenticationRef:
+    #   name: keda-prometheus-auth
+    authenticationRef: {}
+  # HPA scaling behavior
+  behavior:
+    scaleUp:
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+    scaleDown:
+      selectPolicy: Min
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
@@ -36,7 +75,8 @@ apiKeySecret:
   create: true
   apiKey: ""
 
-# default 300
+# default 300, or 330 when autoscaling is enabled so in-flight checks (300s timeout)
+# can complete on scaled-down pods
 terminationGracePeriodSeconds:
 
 # Update strategy for the deployment
