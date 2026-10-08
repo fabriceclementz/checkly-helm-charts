@@ -87,6 +87,12 @@ autoscaling:
 
 `autoscaling.prometheus.metadata` accepts any other parameter of the [KEDA Prometheus scaler](https://keda.sh/docs/latest/scalers/prometheus/), for instance `unsafeSsl` or `customHeaders`.
 
+### Enabling autoscaling on an existing release
+
+The first upgrade that enables autoscaling removes `spec.replicas` from the Deployment. Kubernetes can then reset the replica count to its default of `1`. The HPA scales back up to `autoscaling.minReplicaCount` at once, but above that it only adds one pod per minute with the default `autoscaling.behavior`.
+
+To keep the capacity drop short, set `autoscaling.minReplicaCount` to at least your current replica count for that upgrade, and lower it in a later upgrade.
+
 ### Using your own ScaledObject or HPA
 
 If you already manage a `ScaledObject` or an HPA for the agent Deployment, set `autoscaling.scaledObject.create` to `false`. The chart then leaves `spec.replicas` unset and does not create a `ScaledObject`:
