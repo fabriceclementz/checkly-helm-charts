@@ -70,7 +70,6 @@ When autoscaling is enabled:
 
 - `spec.replicas` is not set on the Deployment, so the replica count is owned by the HPA managed by KEDA and `replicaCount` is ignored. This avoids conflicts between Helm and the HPA, for instance with server-side apply.
 - The scaling threshold defaults to `env.JOB_CONCURRENCY` (or `1`), as recommended. It can be overridden with `autoscaling.threshold`.
-- `terminationGracePeriodSeconds` defaults to `330` so in-flight checks can complete on scaled-down pods.
 
 Use `autoscaling.query` to override the default query. See [values.yaml](values.yaml) for all options.
 

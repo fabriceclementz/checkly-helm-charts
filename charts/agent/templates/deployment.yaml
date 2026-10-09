@@ -42,7 +42,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       shareProcessNamespace: false
-      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default (ternary 330 300 .Values.autoscaling.enabled) }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default 330 }}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}

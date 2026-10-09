@@ -85,8 +85,7 @@ apiKeySecret:
   create: true
   apiKey: ""
 
-# default 300, or 330 when autoscaling is enabled so in-flight checks (300s timeout)
-# can complete on scaled-down pods
+# default 330, so in-flight checks (300s timeout) can complete on terminating pods
 terminationGracePeriodSeconds:
 
 # Update strategy for the deployment
