@@ -1,5 +1,6 @@
 {{- if and .Values.autoscaling.enabled .Values.autoscaling.scaledObject.create -}}
 {{- $slug := .Values.autoscaling.privateLocationSlugName -}}
+{{- $threshold := .Values.autoscaling.threshold | default (.Values.env | default dict).JOB_CONCURRENCY | default 1 -}}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
@@ -26,7 +27,7 @@ spec:
       metadata:
         serverAddress: {{ required "autoscaling.prometheus.serverAddress is required when autoscaling is enabled" .Values.autoscaling.prometheus.serverAddress | quote }}
         metricName: checkly_private_location_check_runs
-        threshold: {{ .Values.autoscaling.threshold | default .Values.env.JOB_CONCURRENCY | default 1 | quote }}
+        threshold: {{ tpl (print $threshold) . | quote }}
         {{- if .Values.autoscaling.query }}
         query: {{ tpl .Values.autoscaling.query . | quote }}
         {{- else }}
